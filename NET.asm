@@ -60,4 +60,4 @@ versionstring	defm	" Net RSX "
 
 		defb	"b",$0d,$0a,$0a,0
 
-EndRom		defs	$ffff-EndRom,0
+		defs	$ffff-$,0

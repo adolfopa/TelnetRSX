@@ -272,10 +272,10 @@ send_cmd_connect
 		ld	a,$9
 		out	(c),a
 
-		ld	a,M4_C_NETCONNECT&$ff
+		ld	a,LOW(M4_C_NETCONNECT)
 		out	(c),a
 
-		ld	a,M4_C_NETCONNECT>>8
+		ld	a,HIGH(M4_C_NETCONNECT)
 		out	(c),a
 
 		pop	af				; Socket
@@ -367,9 +367,9 @@ M4_CMD_NET_LOOKUP_IP_send
 		ld	a,16				; String length
 		out	(c),a
 
-		ld	a,M4_C_NETHOSTIP&$ff
+		ld	a,LOW(M4_C_NETHOSTIP)
 		out	(c),a
-		ld	a,M4_C_NETHOSTIP>>8
+		ld	a,HIGH(M4_C_NETHOSTIP)
 		out	(c),a
 
 		ld	d,14
@@ -407,9 +407,9 @@ M4_CMD_NET_RECEIVE_DATA
 		ld	a,5
 		out	(c),a
 
-		ld	a,M4_C_NETRECV&$ff
+		ld	a,LOW(M4_C_NETRECV)
 		out	(c),a
-		ld	a,M4_C_NETRECV>>8
+		ld	a,HIGH(M4_C_NETRECV)
 		out	(c),a
 
 		pop	af				; Socket
@@ -478,9 +478,9 @@ M4_CMD_NET_SEND_CUSTOM_DATA
 		inc	a
 		out	(c),a
 
-		ld	a,M4_C_NETSEND&$ff
+		ld	a,LOW(M4_C_NETSEND)
 		out	(c),a
-		ld	a,M4_C_NETSEND>>8
+		ld	a,HIGH(M4_C_NETSEND)
 		out	(c),a
 
 		inc	ix
@@ -509,9 +509,9 @@ M4_CMD_CLOSE_CONNECTION
 
 		out	(c),e
 
-		ld	e,M4_C_NETCLOSE&$ff
+		ld	e,LOW(M4_C_NETCLOSE)
 		out	(c),e
-		ld	e,M4_C_NETCLOSE>>8
+		ld	e,HIGH(M4_C_NETCLOSE)
 		out	(c),e
 
 		out	(c),a				; Socket
