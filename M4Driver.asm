@@ -51,8 +51,6 @@ FF06_IX__Get_M4_Socket_Response_Address
 
 		ret
 
-Clear_Z_Flag	ret
-
 ROM_cmdsocket	defb	5
 		defw	M4_C_NETSOCKET
 		defb	$0,$0,$6
@@ -381,17 +379,6 @@ M4_CMD_NET_LOOKUP_IP_sendloop_NEU
 		dec	d
 		jr	nz,M4_CMD_NET_LOOKUP_IP_sendloop_NEU
 
-		ld	bc,$fc00
-		out	(c),c
-		ret
-
-		ld	d,16
-		inc	d
-M4_CMD_NET_LOOKUP_IP_sendloop
-		inc	b
-		outi
-		dec	d
-		jr	nz,M4_CMD_NET_LOOKUP_IP_sendloop
 		ld	bc,$fc00
 		out	(c),c
 		ret
