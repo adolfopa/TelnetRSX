@@ -31,27 +31,25 @@ rsx_name_table	defb	'NET RSX',' '+$80
 		defb	$97
 		defb	0
 
-init_rom	push	ix
-		push	iy
-		push	de
+init_rom	push	af
 		push	hl
 
 		ld	hl,versionstring
-		call	PrintString
+_print_loop	ld	a,(hl)
+		or	a
+		jr	z,_exit
 
-		pop	hl
-		pop	de
-		pop	iy
-		pop	ix
-		scf
-		ret
-
-PrintString	ld	a,(hl)
-		cp	0
-		ret	z
 		call	TXT_OUTPUT
+
 		inc	hl
-		jr	PrintString
+		jr	_print_loop
+
+_exit		pop	hl
+		pop	af
+
+		scf
+
+		ret
 
 		include	"M4Driver.asm"
 

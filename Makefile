@@ -1,7 +1,7 @@
 output	= NET.rom
 
 AS	= pasmo
-ASFLAGS	=
+ASFLAGS	= --alocal
 OFLAG	=
 
 all: $(output)
