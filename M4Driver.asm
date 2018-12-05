@@ -5,8 +5,46 @@ M4_C_NETSEND	equ	$4334
 M4_C_NETRECV	equ	$4335
 M4_C_NETHOSTIP	equ	$4336
 
-M4_CMD_SOCKET	ld	hl,ROM_cmdsocket
-		call	M4_sendcmd
+M4_DATA_PORT	equ	$fe00
+M4_ACK_PORT	equ	$fc00
+
+;;;
+;;; M4_CMD_SOCKET - Ask M4 to return the next free socket descriptor.
+;;;
+;;; Input:	None.
+;;;
+;;; Output:	ZF - Set if no socket is available.
+;;;		A  - Socket descriptor (undefined if ZF).
+;;;
+
+M4_CMD_SOCKET	push	bc
+		push	hl
+
+		;; Send M4 command
+
+		ld	bc,M4_DATA_PORT
+
+		ld	a,5				; Command size
+		out	(c),a
+
+		ld	a,LOW(M4_C_NETSOCKET)		; Command ID
+		out	(c),a
+
+		ld	a,HIGH(M4_C_NETSOCKET)
+		out	(c),a
+
+		xor	a				; 0 = PF_INET
+		out	(c),a
+
+		out	(c),a				; 0 = SOCK_STREAM
+
+		ld	a,6				; 6 = TCP
+		out	(c),a
+
+		ld	bc,M4_ACK_PORT
+		out	(c),c
+
+		;; Read response (socket descriptor) from ROM and return it in A.
 
 		call    GetM4ROMNumber			; OUT: C=ROM number
 
@@ -14,12 +52,15 @@ M4_CMD_SOCKET	ld	hl,ROM_cmdsocket
 
 		call    FF02_IY__Get_M4_Buffer_Response_Address
 
-		inc	hl
+		inc	hl				; Skip 3 byte header.
 		inc	hl
 		inc	hl
 
 		call	Read8BitFromROM			; IN: C=ROM number, HL=Address; OUT: A=Value
 		cp	255
+
+		pop	hl
+		pop	bc
 
 		ret
 
@@ -50,10 +91,6 @@ FF06_IX__Get_M4_Socket_Response_Address
 		pop	af
 
 		ret
-
-ROM_cmdsocket	defb	5
-		defw	M4_C_NETSOCKET
-		defb	$0,$0,$6
 
 ;;;
 ;;; IN: A=Socket, DE=Pointer to IP, ZF=Error
@@ -242,22 +279,6 @@ Read8BitFromROM_Main
 		ld	(ix+1),$c9			; ret
 		push	ix
 		jp	$b90f
-
-;;;
-;;; IN: H =Packet to send
-;;;
-
-M4_sendcmd	ld	bc,$fe00
-		ld	d,(hl)
-		inc	d
-M4_sendcmd_sendloop
-		inc	b
-		outi
-		dec	d
-		jr	nz,M4_sendcmd_sendloop
-		ld	bc,$fc00
-		out	(c),c
-		ret
 
 ;;;
 ;;; IN: A=Socket, HL=Pointer to IP
