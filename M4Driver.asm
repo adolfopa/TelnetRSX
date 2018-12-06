@@ -8,6 +8,9 @@ M4_C_NETHOSTIP	equ	$4336
 M4_DATA_PORT	equ	$fe00
 M4_ACK_PORT	equ	$fc00
 
+M4_RESPONSE_BUF	equ	$ff02
+M4_SOCKET_INFO	equ	$ff06
+
 ;;;
 ;;; M4_CMD_SOCKET - Ask M4 to return the next free socket descriptor.
 ;;;
@@ -48,9 +51,7 @@ M4_CMD_SOCKET	push	bc
 
 		call    GetM4ROMNumber			; OUT: C=ROM number
 
-		;; O: HL=Address
-
-		call    FF02_IY__Get_M4_Buffer_Response_Address
+		call    GetM4ResponseBufferAddress	; OUT: HL=Address
 
 		inc	hl				; Skip 3 byte header.
 		inc	hl
@@ -64,11 +65,19 @@ M4_CMD_SOCKET	push	bc
 
 		ret
 
-FF02_IY__Get_M4_Buffer_Response_Address
+;;;
+;;; GetM4ResponseBufferAddress - Return the M4 response buffer address in HL.
+;;;
+;;; Input:	None.
+;;;
+;;; Output:	HL - M4 response buffer address.
+;;;
+
+GetM4ResponseBufferAddress
 		push	af
 		push	bc
 
-		ld	hl,$ff02
+		ld	hl,M4_RESPONSE_BUF
 		call	Read16BitFromROM		; IN: C=ROM number, HL=Address; OUT: HL=Value
 
 		pop	bc
@@ -77,14 +86,18 @@ FF02_IY__Get_M4_Buffer_Response_Address
 		ret
 
 ;;;
-;;; OUT:  HL=Socket response address
+;;; GetM4SocketInfoAddress - Return a pointer to the first entry in the M4 socket info area.
+;;;
+;;; Input:	None.
+;;;
+;;; Output:	HL - Address of the first entry in the M4 socket info area.
 ;;;
 
-FF06_IX__Get_M4_Socket_Response_Address
+GetM4SocketInfoAddress
 		push	af
 		push	bc
 
-		ld	hl,$ff06
+		ld	hl,M4_SOCKET_INFO
 		call	Read16BitFromROM		; IN: C=ROM number, HL=Address; OUT: HL=Value
 
 		pop	bc
@@ -102,9 +115,7 @@ M4_CMD_CONNECT	ex	de,hl
 
 		call    GetM4ROMNumber			; OUT: C=ROM number
 
-		;; OUT: HL=Address
-
-		call    FF02_IY__Get_M4_Buffer_Response_Address
+		call    GetM4ResponseBufferAddress	; OUT: HL=Address
 
 		inc	hl
 		inc	hl
@@ -157,9 +168,7 @@ GetSocketPtr	push	hl
 		sla	a
 		sla	a
 
-		;; IN: C=ROM number; OUT: HL=Socket response address
-
-		call 	FF06_IX__Get_M4_Socket_Response_Address
+		call 	GetM4SocketInfoAddress		; IN: C=ROM number; OUT: HL=Socket info addr.
 
 		ld	e,a
 		ld	d,0
@@ -336,9 +345,7 @@ M4_CMD_NET_LOOKUP_IP
 
 		call	GetM4ROMNumber			; OUT: C=ROM number
 
-		;; OUT: HL=Address
-
-		call	FF02_IY__Get_M4_Buffer_Response_Address
+		call	GetM4ResponseBufferAddress	; OUT: HL=Address
 
 		inc	hl
 		inc	hl
@@ -351,10 +358,7 @@ M4_CMD_NET_LOOKUP_IP
 		ld	a,1
 		ret
 M4_CMD_NET_LOOKUP_IP_wait
-
-		;; OUT: HL=Socket response adress
-
-		call 	FF06_IX__Get_M4_Socket_Response_Address
+		call 	GetM4SocketInfoAddress		; OUT: HL=Socket info address
 M4_CMD_NET_LOOKUP_IP_wait_lookup
 		call	Read8BitFromROM			; IN: C=ROM number, HL=Address; OUT: A=Value
 		cp	5				; IP lookup in progress.
@@ -432,9 +436,7 @@ M4_CMD_NET_RECEIVE_DATA
 
 		call    GetM4ROMNumber			; OUT: C=ROM number
 
-		;; IN: C=ROM number; OUT: HL=Address
-
-		call	FF02_IY__Get_M4_Buffer_Response_Address
+		call	GetM4ResponseBufferAddress	; IN: C=ROM number; OUT: HL=Address
 
 		inc	hl
 		inc	hl
@@ -463,9 +465,7 @@ M4_CMD_NET_RECEIVE_DATA___TRANSFER_DATA_LOOP
 		or	e
 		jr	nz,M4_CMD_NET_RECEIVE_DATA___TRANSFER_DATA_LOOP
 
-		;; IN: C=ROM number; OUT: HL=Address
-
-		call	FF02_IY__Get_M4_Buffer_Response_Address
+		call	GetM4ResponseBufferAddress	; IN: C=ROM number; OUT: HL=Address
 
 		inc	hl
 		inc	hl
