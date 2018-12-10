@@ -127,14 +127,14 @@ M4_CMD_CONNECT	ex	de,hl
 		ret
 
 ;;;
-;;; M4_GET_SOCKET_STATE - Return the socket state and the amount of data ready to be read.
+;;; M4_CMD_SOCKET_STATE - Return the socket state and the amount of data ready to be read.
 ;;;
 ;;; Input:	A  - Socket
 ;;; Output:	A  - State (0=Idle, 1=Connect in progress, 2=Send in progress)
 ;;;		HL - Amount of data ready to be read
 ;;;
 
-M4_GET_SOCKET_STATE
+M4_CMD_SOCKET_STATE
 		push	bc
 		push	ix
 

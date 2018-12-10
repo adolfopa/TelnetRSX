@@ -15,7 +15,7 @@ rsx_names	defw	rsx_name_table
 
 extra_rsxs	jp 	M4_CMD_SOCKET
 		jp	M4_CMD_CONNECT
-		jp	M4_GET_SOCKET_STATE
+		jp	M4_CMD_SOCKET_STATE
 		jp	M4_CMD_NET_RECEIVE_DATA
 		jp	M4_CMD_NET_LOOKUP_IP
 		jp	M4_CMD_NET_SEND_CUSTOM_DATA
