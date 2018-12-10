@@ -127,32 +127,32 @@ M4_CMD_CONNECT	ex	de,hl
 		ret
 
 ;;;
-;;; IN: A=Socket; OUT: A=State (0=Idle, 1=Connect in progress, 2=Send in progress)
+;;; M4_GET_SOCKET_STATE - Return the socket state and the amount of data ready to be read.
+;;;
+;;; Input:	A  - Socket
+;;; Output:	A  - State (0=Idle, 1=Connect in progress, 2=Send in progress)
+;;;		HL - Amount of data ready to be read
 ;;;
 
 M4_GET_SOCKET_STATE
+		push	bc
 		push	ix
-		push	hl
 
 		call    GetM4ROMNumber			; OUT: C=ROM number
 		call	GetSocketPtr			; IN: A=Socket, C=ROM number; OUT: ix=Socket prt.
 
 		push	ix
-
-		inc	ix
-		inc	ix
-
-		push	ix
 		pop	hl
 
-		call	Read16BitFromROM		; IN: C=ROM number, HL=Address; OUT: HL=Value
+		call	Read8BitFromROM			; Read state into A
 
-		ex	de,hl
-		pop	hl
-		call	Read8BitFromROM			; IN: C=ROM number, HL=Address; OUT: A=Value
+		inc	hl				; Point to recv pending data in sockinfo struct
+		inc	hl
 
-		pop	hl
+		call	Read16BitFromROM		; Read recv count into HL
+
 		pop	ix
+		pop	bc
 
 		ret
 
